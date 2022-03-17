@@ -1,0 +1,26 @@
+{
+  "name": "ts-unused-class-method",
+  "version": "0.0.1",
+  "description": "分析export出的class未被调用的方法",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KlausBai/ts-unused-class-method.git"
+  },
+  "author": "klausbai",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KlausBai/ts-unused-class-method/issues"
+  },
+  "homepage": "https://github.com/KlausBai/ts-unused-class-method#readme",
+  "dependencies": {
+    "typescript": "^4.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21"
+  }
+}
