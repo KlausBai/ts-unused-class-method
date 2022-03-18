@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts = require('typescript');
 import { TsConfig ,Analysis} from './types'
 import { dirname, resolve } from 'path';
 import { parseFilesByTsConfig } from './parser';
@@ -31,7 +31,7 @@ const parseTsConfig = (tsconfigPath: string): TsConfig => {
     // (I think this only occurs with unit tests!)
     return {
       baseUrl: result.options.baseUrl || basePath,
-      paths: result.options.paths,
+      paths: result.options.paths!,
       files: result.fileNames,
     };
   } catch (e) {

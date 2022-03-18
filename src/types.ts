@@ -1,4 +1,4 @@
-import ts from "typescript";
+import ts = require('typescript');
 
 export interface Analysis {
   [index: string]: FileClassMethodsChain[];
@@ -10,7 +10,7 @@ export interface TsConfigPaths {
 
 export interface TsConfig {
   baseUrl: string;
-  paths?: TsConfigPaths;
+  paths: TsConfigPaths;
   files: string[];
 }
 
@@ -19,3 +19,5 @@ export interface FileClassMethodsChain {
   classDeclaration: ts.ClassDeclaration;
   methodDeclaration: ts.MethodDeclaration
 }
+
+export type PropertyNameToExportName = Record<string,string>
