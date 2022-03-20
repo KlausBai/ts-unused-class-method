@@ -121,5 +121,47 @@ export const parseFilesByTsConfig = ({
   const importGraph = [];
   const exportGraph = [];
   // traverse all file to statistics the class's import and export situation
+  const program = ts.createProgram({
+    rootNames: filePaths,
+    options:{
+      paths,
+      baseUrl,
+    }
+  })
+  const checker = program.getTypeChecker();
   filePaths.forEach((path) => parseFile(resolve(".", path), baseUrl, paths));
 };
+
+
+// change to oop to keep variable
+export default class TsFileParser{
+  private program:ts.Program;
+  private typeChecker:ts.TypeChecker;
+
+  constructor(
+    private baseUrl: string,
+    private paths: TsConfigPaths ,
+    private files: Array<string>){
+      this.program =  ts.createProgram({
+        rootNames: files,
+        options:{
+          paths,
+          baseUrl,
+        }
+      })
+      this.typeChecker = this.program.getTypeChecker();
+  } 
+
+  public getParsedFileByTsConfig(){
+    for(const filePath of this.files){
+      const sourceFile = this.program.getSourceFileByPath(filePath as ts.Path);
+      this.parseFile(sourceFile!);
+    }
+  }
+
+  private parseFile(sourceFile:ts.SourceFile){
+    ts.forEachChild(sourceFile,(childNode)=>{
+
+    });
+  }
+}

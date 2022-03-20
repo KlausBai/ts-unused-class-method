@@ -44,12 +44,11 @@ const parseTsConfig = (tsconfigPath: string): TsConfig => {
 };
 
 const acquireTsConfigPathInfo = (
-  tsconfigPath: string,
-  explicitFiles?: string[],
+  tsconfigPath: string
 ): TsConfig => {
   const { baseUrl, files, paths } = parseTsConfig(tsconfigPath);
 
-  return { baseUrl, paths, files: explicitFiles || files };
+  return { baseUrl, paths, files: files };
 };
 
 const analyzeFromTsConfig = (tsconfigPath: string) =>{
