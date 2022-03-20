@@ -58,6 +58,12 @@ const parseFile = (
     
     console.log(node); // deleted after complete
 
+    /**
+     * hope to get :
+     * import : import path/ import symbol
+     * export : export name/ export name 
+     */
+
     if (kind === ts.SyntaxKind.ImportDeclaration) {
       // import detail in acquireImportDeclarationInfo
       const [ clause, filePath ] = acquireImportDeclarationInfo(node as ts.ImportDeclaration);
