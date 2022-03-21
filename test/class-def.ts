@@ -7,4 +7,8 @@ export default class BizTest {
     public getBizTestA(){
         return this.a;
     }
+    
+    public redundantFunc(){
+        console.log('this is just a redundantFunc');
+    }
 }

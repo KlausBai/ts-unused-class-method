@@ -10,5 +10,6 @@ export default class Service {
 
     printfBizTestA(){
         console.log(this.BizTest.getBizTestA());
+        console.log('aaa')
     }
 }
