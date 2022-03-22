@@ -1,5 +1,6 @@
 import { resolve } from 'path';
 import  ts = require('typescript');
+// import { hasPropertyAccess } from '../src/utils'
 
 const filePath = resolve('.','../test/index.ts');
 const ImportedFilePath = resolve('.','../test/export-assignment.ts');
@@ -101,4 +102,72 @@ DFS_AST_GET_THIS(sourceFileNode);
 //     const childSymbol = typeChecker.getSymbolAtLocation((decl as ts.ExportAssignment).expression);
 //     console.log({childSymbol});
 // });
-console.log({symbolA,symbolB,equal:symbolA===symbolB})
+// console.log({symbolA,symbolB,equal:symbolA===symbolB})
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * check perperty access chain son  
+ */
+// let dep = 0;
+
+// function watchPropertyAccess(express:ts.Node,dep=0){
+//     ts.forEachChild(express,(childNode)=>{
+//         console.log({
+//             parent:express.getText(),
+//             text:childNode.getText(),
+//             type: ts.SyntaxKind[childNode.kind],
+//             dep
+//         });
+//         watchPropertyAccess(childNode,dep+1);
+//     })
+// }
+
+// function collectClassUsedMember(sourceFile:ts.SourceFile){
+//     if(!hasPropertyAccess(sourceFile)) return ;
+//     const possibleNodes : Array<ts.Node> = [sourceFile];
+//     while(possibleNodes.length){
+//       const currentNode = possibleNodes.pop()!;
+//       ts.forEachChild(currentNode,(childNode)=>{
+//           if(!hasPropertyAccess(childNode)) return ; 
+//           if(ts.isPropertyAccessExpression(childNode)){
+//             const name = ts.getNameOfDeclaration(childNode.expression)!;
+//             const type = typeChecker.getTypeAtLocation(name).symbol;
+//             if(type){
+//               watchPropertyAccess(childNode);
+//             }
+//           } else possibleNodes.push(childNode);
+//       })
+//     }
+//   }
+//   collectClassUsedMember(sourceFileNode);
+
+/**
+ * { parent: 'console.log', text: 'console', type: 'Identifier', dep: 0 }
+{ parent: 'console.log', text: 'log', type: 'Identifier', dep: 0 }
+{ parent: 'console.log', text: 'console', type: 'Identifier', dep: 0 }
+{ parent: 'console.log', text: 'log', type: 'Identifier', dep: 0 }
+{
+  parent: 'this.BizTest.getBizTestA',
+  text: 'this.BizTest',
+  type: 'PropertyAccessExpression',
+  dep: 0
+}
+{ parent: 'this.BizTest', text: 'this', type: 'ThisKeyword', dep: 1 }
+{ parent: 'this.BizTest', text: 'BizTest', type: 'Identifier', dep: 1 }
+{
+  parent: 'this.BizTest.getBizTestA',
+  text: 'getBizTestA',
+  type: 'Identifier',
+  dep: 0
+}
+ */

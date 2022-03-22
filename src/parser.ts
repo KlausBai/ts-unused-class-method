@@ -16,16 +16,18 @@ export default class TsFileParser {
   private typeChecker: ts.TypeChecker;
   private importTypesPath = new Map<
     ts.Symbol,
-    { filePath: string; importName: ts.Identifier,members: ts.SymbolTable }
+    { filePath: string; importName: ts.Identifier }
   >();
   private exportTypesPath = new Map<
     ts.Symbol,
-    { filePath: string; exportName: ts.Identifier, members: ts.SymbolTable}
+    { filePath: string; exportName: ts.Identifier}
   >();
   private absolutizeOriginPath: ReturnType<typeof absolutizeOriginPathFactory> =
     (o) => o;
 
   private currentSourceFile?: ts.SourceFile;
+
+  private visitedTypeTree = new Map<ts.Symbol,Array<ts.Symbol>>();/** use adjacency list to store used type */
 
   constructor(
     private baseUrl: string,
@@ -57,6 +59,7 @@ export default class TsFileParser {
   private parseFile(sourceFile: ts.SourceFile) {
     this.currentSourceFile = sourceFile;
     this.collectExportInfo(sourceFile);
+    this.collectClassUsedMember(sourceFile);
     ts.forEachChild(sourceFile, (childNode) => {
       this.collectImportInfo(childNode);
     });
@@ -89,7 +92,6 @@ export default class TsFileParser {
         this.importTypesPath.set(type, {
           filePath: absoluteFilePath,
           importName,
-          members:type.members!
         });
     });
   }
@@ -111,7 +113,6 @@ export default class TsFileParser {
       this.exportTypesPath.set(type, {
         filePath: path,
         exportName: expression,
-        members: type.members!
       });
     }
   }
@@ -124,7 +125,6 @@ export default class TsFileParser {
       this.exportTypesPath.set(type, {
         filePath: path,
         exportName: name,
-        members:type.members!
       });
     }
   }
@@ -161,10 +161,42 @@ export default class TsFileParser {
       ts.forEachChild(currentNode,(childNode)=>{
           if(!hasPropertyAccess(childNode)) return ; 
           if(ts.isPropertyAccessExpression(childNode)){
-            const type = this.typeChecker.getTypeAtLocation(childNode).symbol;
-            
+            const name = ts.getNameOfDeclaration(childNode.expression)!;
+            const type = this.typeChecker.getTypeAtLocation(name).symbol;
+            if(type){
+              this.watchPropertyAccess(childNode);
+            }
           } else possibleNodes.push(childNode);
       })
     }
+  }
+
+  /**
+   * `this.bizTest.x`'s dfs stack: 
+   *  this.bizTest.x | this.bizTest | this | bizTest | x
+   */
+  private propertyTypeChain:Array<ts.Symbol> = []
+
+  private watchPropertyAccess(propertyAccessNode:ts.Node,dep = 0){
+    const type = this.typeChecker.getTypeAtLocation(propertyAccessNode).symbol;
+    if(!type) return false;
+    if(this.importTypesPath.has(type)){
+      let parent = type;
+      for(let p = dep-1;p>=0;p--){
+        const son = this.propertyTypeChain[p];
+        const edgeList = this.visitedTypeTree.has(parent)?this.visitedTypeTree.get(parent)!:new Array<ts.Symbol>();
+        edgeList.push(son);
+        this.visitedTypeTree.set(parent,edgeList);
+      }
+      return true;
+    }
+    let hasFind = false; /** has find recorded type */
+    this.propertyTypeChain.push(type);
+    ts.forEachChild(propertyAccessNode,(childAccess)=>{
+      if(hasFind) return ;
+      hasFind = hasFind || this.watchPropertyAccess(childAccess,dep+1);
+    });
+    this.propertyTypeChain.pop();
+    return hasFind;
   }
 }
