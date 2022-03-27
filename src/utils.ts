@@ -79,3 +79,7 @@ export const hasPropertyAccess= (node:ts.Node)=>{
   const text = node.getText();
   return text.includes('.');
 }
+
+export const extarctNameListFromSymbolTable = (symbolTable?:ts.SymbolTable)=>{
+  const nameList = new Array<string>();symbolTable&&symbolTable.forEach((_,key)=>nameList.push(String(key)));return nameList;
+}

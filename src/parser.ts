@@ -5,11 +5,16 @@ import {
   mayContainDynamicImports,
   absolutizeOriginPathFactory,
   extractImportNames,
-  hasPropertyAccess
+  hasPropertyAccess,
+  extarctNameListFromSymbolTable
 } from "./utils";
+import { UnusedMemberOfClass } from './targetInfo'
 
 /**
  * get no used class methods by punch type methods
+ * 1. get methods call graph
+ * 2. use appointed filepath to dye methods node
+ * 3. diff export class's member and dyed members to get unused methods
  */
 export default class TsFileParser {
   private program: ts.Program;
@@ -27,7 +32,10 @@ export default class TsFileParser {
 
   private currentSourceFile?: ts.SourceFile;
 
-  private visitedTypeTree = new Map<ts.Symbol,Array<ts.Symbol>>();/** use adjacency list to store used type */
+  private calledMemberTree = new Map<ts.Symbol,Set<ts.Symbol>>();
+  private primaryCalledMethod = new Set<ts.Symbol>();
+
+  private unusedMemberOfClass = new Array<UnusedMemberOfClass>()
 
   constructor(
     private baseUrl: string,
@@ -59,7 +67,7 @@ export default class TsFileParser {
   private parseFile(sourceFile: ts.SourceFile) {
     this.currentSourceFile = sourceFile;
     this.collectExportInfo(sourceFile);
-    this.collectClassUsedMember(sourceFile);
+    this.constructVisitedMembersGraph(sourceFile);
     ts.forEachChild(sourceFile, (childNode) => {
       this.collectImportInfo(childNode);
     });
@@ -153,50 +161,71 @@ export default class TsFileParser {
     });
   }
   
-  private collectClassUsedMember(sourceFile:ts.SourceFile){
+
+
+  private constructVisitedMembersGraph(sourceFile: ts.SourceFile){
     if(!hasPropertyAccess(sourceFile)) return ;
-    const possibleNodes : Array<ts.Node> = [sourceFile];
-    while(possibleNodes.length){
-      const currentNode = possibleNodes.pop()!;
-      ts.forEachChild(currentNode,(childNode)=>{
-          if(!hasPropertyAccess(childNode)) return ; 
-          if(ts.isPropertyAccessExpression(childNode)){
-            const name = ts.getNameOfDeclaration(childNode.expression)!;
-            const type = this.typeChecker.getTypeAtLocation(name).symbol;
-            if(type){
-              this.watchPropertyAccess(childNode);
-            }
-          } else possibleNodes.push(childNode);
+    const dfsTsNodeToCollectCallGraph = (node: ts.Node,container:ts.SourceFile|ts.MethodDeclaration)=>{
+      // only collect top level method info
+      const newContainer = ts.isMethodDeclaration(node)?node:container;
+      ts.forEachChild(node,(childNode)=>{
+        if(!hasPropertyAccess(childNode)) return ; 
+        if(ts.isPropertyAccessExpression(childNode)){
+          const name = ts.getNameOfDeclaration(childNode.expression)!;
+          const type = this.typeChecker.getTypeAtLocation(name).symbol;/** if a.memberA only be used in b.memberB but b.memberB had been used ? */
+          if(type){
+            this.watchPropertyAccess(childNode,newContainer);
+          }
+        } else dfsTsNodeToCollectCallGraph(childNode,newContainer);
       })
     }
+    dfsTsNodeToCollectCallGraph(sourceFile,sourceFile);
   }
 
   /**
    * `this.bizTest.x`'s dfs stack: 
    *  this.bizTest.x | this.bizTest | this | bizTest | x
    */
-  private propertyTypeChain:Array<ts.Symbol> = []
 
-  private watchPropertyAccess(propertyAccessNode:ts.Node,dep = 0){
-    const type = this.typeChecker.getTypeAtLocation(propertyAccessNode).symbol;
-    if(!type) return false;
-    if(this.importTypesPath.has(type)){
-      let parent = type;
-      for(let p = dep-1;p>=0;p--){
-        const son = this.propertyTypeChain[p];
-        const edgeList = this.visitedTypeTree.has(parent)?this.visitedTypeTree.get(parent)!:new Array<ts.Symbol>();
-        edgeList.push(son);
-        this.visitedTypeTree.set(parent,edgeList);
+  private watchPropertyAccess(propertyAccessNode:ts.Node,invokeContainer:ts.SourceFile|ts.MethodDeclaration){
+    const propertyTypeChain:Array<ts.Symbol> = [];
+    const invokeContainerSymbol = ts.isMethodDeclaration(invokeContainer)?this.typeChecker.getTypeAtLocation(invokeContainer.name).symbol:undefined
+    const callGraph = this.calledMemberTree ; 
+    const EdgeSet = invokeContainerSymbol? callGraph.has(invokeContainerSymbol)?callGraph.get(invokeContainerSymbol)!: new Set<ts.Symbol>(): this.primaryCalledMethod;
+    const dfsWatchPropertyAccess = (node:ts.Node,dep =0) => {
+      const type = this.typeChecker.getTypeAtLocation(node).symbol;
+      if(!type) return false;
+      if(this.importTypesPath.has(type)|| ts.isThisTypeNode(node)){
+        // TODO: is in class
+        for(let p = dep-1;p>=0;p--){
+          const son = propertyTypeChain[p];
+          EdgeSet.add(son);
+        }
+        return true;
       }
-      return true;
-    }
-    let hasFind = false; /** has find recorded type */
-    this.propertyTypeChain.push(type);
-    ts.forEachChild(propertyAccessNode,(childAccess)=>{
-      if(hasFind) return ;
-      hasFind = hasFind || this.watchPropertyAccess(childAccess,dep+1);
-    });
-    this.propertyTypeChain.pop();
-    return hasFind;
+      let hasFind = false; /** has find recorded type */
+      propertyTypeChain.push(type);
+      ts.forEachChild(node,(childAccess)=>{
+        if(hasFind) return ;
+        hasFind = hasFind || dfsWatchPropertyAccess(childAccess,dep+1);
+      });
+      propertyTypeChain.pop();
+      return hasFind;
+    } 
+    return dfsWatchPropertyAccess(propertyAccessNode as ts.PropertyAccessExpression);
+  }
+
+  private diffUnusedClassMethods(){
+    const originGraph = this.exportTypesPath;
+    const unusedStore = this.unusedMemberOfClass;
+    originGraph.forEach(({filePath,exportName},key)=>{
+      const visistedMembers = this.calledMemberTree.get(key);
+      const members = key.members;
+      if(!visistedMembers || !visistedMembers.size){
+        unusedStore.push(new UnusedMemberOfClass(filePath,exportName,extarctNameListFromSymbolTable(members)));
+      } else {
+
+      }
+    })
   }
 }
