@@ -1,0 +1,296 @@
+{
+    "flags": 8192,
+    "escapedName": "getBizTestA",
+    "declarations": [
+        {
+            "pos": 74,
+            "end": 138,
+            "flags": 32768,
+            "modifierFlagsCache": 536870916,
+            "transformFlags": 2106497,
+            "kind": 168,
+            "modifiers": [
+                {
+                    "pos": 74,
+                    "end": 92,
+                    "flags": 32768,
+                    "modifierFlagsCache": 0,
+                    "transformFlags": 1,
+                    "kind": 123
+                }
+            ],
+            "locals": {},
+            "nextContainer": {
+                "pos": 138,
+                "end": 234,
+                "flags": 33024,
+                "modifierFlagsCache": 536870916,
+                "transformFlags": 1025,
+                "kind": 168,
+                "modifiers": [
+                    {
+                        "pos": 138,
+                        "end": 156,
+                        "flags": 32768,
+                        "modifierFlagsCache": 0,
+                        "transformFlags": 1,
+                        "kind": 123
+                    }
+                ],
+                "symbol": {
+                    "flags": 8192,
+                    "escapedName": "redundantFunc",
+                    "declarations": [
+                        null
+                    ]
+                },
+                "locals": {},
+                "name": {
+                    "pos": 156,
+                    "end": 170,
+                    "flags": 32768,
+                    "modifierFlagsCache": 0,
+                    "transformFlags": 0,
+                    "kind": 79,
+                    "escapedText": "redundantFunc",
+                    "flowNode": {
+                        "flags": 2050
+                    }
+                },
+                "parameters": [],
+                "body": {
+                    "pos": 172,
+                    "end": 234,
+                    "flags": 0,
+                    "modifierFlagsCache": 0,
+                    "transformFlags": 0,
+                    "kind": 234,
+                    "statements": [
+                        {
+                            "pos": 173,
+                            "end": 227,
+                            "flags": 0,
+                            "modifierFlagsCache": 0,
+                            "transformFlags": 0,
+                            "kind": 237,
+                            "expression": {
+                                "pos": 173,
+                                "end": 226,
+                                "flags": 0,
+                                "modifierFlagsCache": 0,
+                                "transformFlags": 0,
+                                "kind": 207,
+                                "expression": {
+                                    "pos": 173,
+                                    "end": 194,
+                                    "flags": 0,
+                                    "modifierFlagsCache": 0,
+                                    "transformFlags": 0,
+                                    "kind": 205,
+                                    "expression": {
+                                        "pos": 173,
+                                        "end": 190,
+                                        "flags": 0,
+                                        "modifierFlagsCache": 0,
+                                        "transformFlags": 0,
+                                        "kind": 79,
+                                        "escapedText": "console"
+                                    },
+                                    "name": {
+                                        "pos": 191,
+                                        "end": 194,
+                                        "flags": 0,
+                                        "modifierFlagsCache": 0,
+                                        "transformFlags": 0,
+                                        "kind": 79,
+                                        "escapedText": "log"
+                                    }
+                                },
+                                "arguments": [
+                                    {
+                                        "pos": 195,
+                                        "end": 225,
+                                        "flags": 0,
+                                        "modifierFlagsCache": 0,
+                                        "transformFlags": 0,
+                                        "kind": 10,
+                                        "text": "this is just a redundantFunc",
+                                        "hasExtendedUnicodeEscape": false
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "multiLine": true
+                },
+                "endFlowNode": {
+                    "flags": 512
+                }
+            },
+            "name": {
+                "pos": 92,
+                "end": 104,
+                "flags": 32768,
+                "modifierFlagsCache": 0,
+                "transformFlags": 0,
+                "kind": 79,
+                "escapedText": "getBizTestA",
+                "flowNode": {
+                    "flags": 2
+                }
+            },
+            "parameters": [],
+            "body": {
+                "pos": 106,
+                "end": 138,
+                "flags": 0,
+                "modifierFlagsCache": 0,
+                "transformFlags": 2105472,
+                "kind": 234,
+                "statements": [
+                    {
+                        "pos": 107,
+                        "end": 131,
+                        "flags": 0,
+                        "modifierFlagsCache": 0,
+                        "transformFlags": 2105472,
+                        "kind": 246,
+                        "expression": {
+                            "pos": 123,
+                            "end": 130,
+                            "flags": 0,
+                            "modifierFlagsCache": 0,
+                            "transformFlags": 8192,
+                            "kind": 205,
+                            "expression": {
+                                "pos": 123,
+                                "end": 128,
+                                "flags": 0,
+                                "modifierFlagsCache": 0,
+                                "transformFlags": 8192,
+                                "kind": 108
+                            },
+                            "name": {
+                                "pos": 129,
+                                "end": 130,
+                                "flags": 0,
+                                "modifierFlagsCache": 0,
+                                "transformFlags": 0,
+                                "kind": 79,
+                                "escapedText": "a"
+                            }
+                        }
+                    }
+                ],
+                "multiLine": true
+            }
+        }
+    ],
+    "id": 10
+}{
+    "flags": 8192,
+    "escapedName": "redundantFunc",
+    "declarations": [
+        {
+            "pos": 138,
+            "end": 234,
+            "flags": 33024,
+            "modifierFlagsCache": 536870916,
+            "transformFlags": 1025,
+            "kind": 168,
+            "modifiers": [
+                {
+                    "pos": 138,
+                    "end": 156,
+                    "flags": 32768,
+                    "modifierFlagsCache": 0,
+                    "transformFlags": 1,
+                    "kind": 123
+                }
+            ],
+            "locals": {},
+            "name": {
+                "pos": 156,
+                "end": 170,
+                "flags": 32768,
+                "modifierFlagsCache": 0,
+                "transformFlags": 0,
+                "kind": 79,
+                "escapedText": "redundantFunc",
+                "flowNode": {
+                    "flags": 2050
+                }
+            },
+            "parameters": [],
+            "body": {
+                "pos": 172,
+                "end": 234,
+                "flags": 0,
+                "modifierFlagsCache": 0,
+                "transformFlags": 0,
+                "kind": 234,
+                "statements": [
+                    {
+                        "pos": 173,
+                        "end": 227,
+                        "flags": 0,
+                        "modifierFlagsCache": 0,
+                        "transformFlags": 0,
+                        "kind": 237,
+                        "expression": {
+                            "pos": 173,
+                            "end": 226,
+                            "flags": 0,
+                            "modifierFlagsCache": 0,
+                            "transformFlags": 0,
+                            "kind": 207,
+                            "expression": {
+                                "pos": 173,
+                                "end": 194,
+                                "flags": 0,
+                                "modifierFlagsCache": 0,
+                                "transformFlags": 0,
+                                "kind": 205,
+                                "expression": {
+                                    "pos": 173,
+                                    "end": 190,
+                                    "flags": 0,
+                                    "modifierFlagsCache": 0,
+                                    "transformFlags": 0,
+                                    "kind": 79,
+                                    "escapedText": "console"
+                                },
+                                "name": {
+                                    "pos": 191,
+                                    "end": 194,
+                                    "flags": 0,
+                                    "modifierFlagsCache": 0,
+                                    "transformFlags": 0,
+                                    "kind": 79,
+                                    "escapedText": "log"
+                                }
+                            },
+                            "arguments": [
+                                {
+                                    "pos": 195,
+                                    "end": 225,
+                                    "flags": 0,
+                                    "modifierFlagsCache": 0,
+                                    "transformFlags": 0,
+                                    "kind": 10,
+                                    "text": "this is just a redundantFunc",
+                                    "hasExtendedUnicodeEscape": false
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "multiLine": true
+            },
+            "endFlowNode": {
+                "flags": 512
+            }
+        }
+    ],
+    "id": 11
+}

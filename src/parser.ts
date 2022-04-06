@@ -165,9 +165,9 @@ export default class TsFileParser {
 
   private constructVisitedMembersGraph(sourceFile: ts.SourceFile){
     if(!hasPropertyAccess(sourceFile)) return ;
-    const dfsTsNodeToCollectCallGraph = (node: ts.Node,container:ts.SourceFile|ts.MethodDeclaration)=>{
+    const dfsTsNodeToCollectCallGraph = (node: ts.Node,container:ts.SourceFile|ts.MethodDeclaration|ts.ClassDeclaration)=>{
       // only collect top level method info
-      const newContainer = ts.isMethodDeclaration(node)?node:container;
+      const newContainer = ts.isMethodDeclaration(node) || ts.isClassDeclaration(node)?node:container;
       ts.forEachChild(node,(childNode)=>{
         if(!hasPropertyAccess(childNode)) return ; 
         if(ts.isPropertyAccessExpression(childNode)){
@@ -187,11 +187,13 @@ export default class TsFileParser {
    *  this.bizTest.x | this.bizTest | this | bizTest | x
    */
 
-  private watchPropertyAccess(propertyAccessNode:ts.Node,invokeContainer:ts.SourceFile|ts.MethodDeclaration){
+  private watchPropertyAccess(propertyAccessNode:ts.Node,invokeContainer:ts.SourceFile|ts.MethodDeclaration|ts.ClassDeclaration){
     const propertyTypeChain:Array<ts.Symbol> = [];
-    const invokeContainerSymbol = ts.isMethodDeclaration(invokeContainer)?this.typeChecker.getTypeAtLocation(invokeContainer.name).symbol:undefined
+    const invokeContainerSymbol = !ts.isSourceFile(invokeContainer)?this.typeChecker.getTypeAtLocation(invokeContainer).getSymbol():undefined
     const callGraph = this.calledMemberTree ; 
-    const EdgeSet = invokeContainerSymbol? callGraph.has(invokeContainerSymbol)?callGraph.get(invokeContainerSymbol)!: new Set<ts.Symbol>(): this.primaryCalledMethod;
+    const EdgeSet = invokeContainerSymbol ? 
+                    callGraph.has(invokeContainerSymbol) ? callGraph.get(invokeContainerSymbol)!: new Set<ts.Symbol>(): 
+                    this.primaryCalledMethod;
     const dfsWatchPropertyAccess = (node:ts.Node,dep =0) => {
       const type = this.typeChecker.getTypeAtLocation(node).symbol;
       if(!type) return false;

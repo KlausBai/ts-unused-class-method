@@ -2,8 +2,27 @@
 exports.__esModule = true;
 var path_1 = require("path");
 var ts = require("typescript");
+var fs = require("fs");
 // import { hasPropertyAccess } from '../src/utils'
-var filePath = (0, path_1.resolve)('.', '../test/index.ts');
+fs.writeFileSync('./out.txt', "");
+var printTsNodeWithoutPa = function (node) {
+    if (typeof node !== "object")
+        return;
+    var cache = [];
+    fs.appendFileSync('./out.txt', JSON.stringify(node, function (key, value) {
+        if (key === 'parent')
+            return;
+        if (typeof value === 'object' && value !== null) {
+            if (cache.indexOf(value) !== -1) {
+                return;
+            }
+            cache.push(value);
+        }
+        return value;
+    }, 4));
+    cache = null;
+};
+var filePath = (0, path_1.resolve)('.', '../test/class-def.ts');
 var ImportedFilePath = (0, path_1.resolve)('.', '../test/export-assignment.ts');
 var index = 0;
 var program = ts.createProgram({
@@ -29,24 +48,32 @@ ts.forEachChild(sourceFileNode, function (node) {
     //     parent:undefined
     // }});
     // index++;
-    var kind = node.kind;
-    if (kind === ts.SyntaxKind.ImportDeclaration) {
-        // const claus = (node as ts.ImportDeclaration).importClause.name;
-        // const symbol = typeChecker.getSymbolAtLocation(claus);
-        // const type = typeChecker.getTypeAtLocation(claus).symbol;
-        // typeA=type;
-        // console.log({symbol,type})
-        // exp B
-        var clause = node.importClause;
-        var namedBindings = clause.namedBindings;
-        var nameArray = namedBindings ?
-            (namedBindings === null || namedBindings === void 0 ? void 0 : namedBindings.name) ? [namedBindings === null || namedBindings === void 0 ? void 0 : namedBindings.name] : namedBindings.elements.map(function (e) { return (e.propertyName || e.name); }) : clause.name ? [clause.name] : [];
-        nameArray.forEach(function (name) {
-            var nameText = name.getText();
-            var symbol = typeChecker.getSymbolAtLocation(name);
-            var type = typeChecker.getTypeAtLocation(name).symbol;
-            symbolA = symbol;
-            // console.log({nameText,symbol,type})
+    // const {kind} = node;
+    // if(kind === ts.SyntaxKind.ImportDeclaration){
+    //     // const claus = (node as ts.ImportDeclaration).importClause.name;
+    //     // const symbol = typeChecker.getSymbolAtLocation(claus);
+    //     // const type = typeChecker.getTypeAtLocation(claus).symbol;
+    //     // typeA=type;
+    //     // console.log({symbol,type})
+    //     // exp B
+    //     const clause = (node as ts.ImportDeclaration).importClause;
+    //     const { namedBindings } = clause;
+    //     const nameArray = namedBindings?
+    //     (namedBindings as ts.NamespaceImport)?.name?[(namedBindings as ts.NamespaceImport)?.name]: (namedBindings as ts.NamedImports).elements.map(
+    //         (e) => (e.propertyName || e.name),
+    //         ):clause.name?[clause.name]:[]
+    //     nameArray.forEach(name=>{
+    //         const nameText = name.getText();
+    //         const symbol = typeChecker.getSymbolAtLocation(name);
+    //         const type = typeChecker.getTypeAtLocation(name).symbol;
+    //         symbolA = symbol;
+    //         // console.log({nameText,symbol,type})
+    //     })
+    // }
+    if (ts.isClassDeclaration(node)) {
+        // console.log(typeChecker.getTypeAtLocation(node).getSymbol())
+        ts.forEachChild(node, function (chi) {
+            printTsNodeWithoutPa(typeChecker.getTypeAtLocation(chi).getSymbol());
         });
     }
 });
@@ -71,7 +98,7 @@ function DFS_AST_GET_THIS(node, dep) {
     // console.log(nodeText,dep,thisExpressionCount);
     return thisExpressionCount;
 }
-DFS_AST_GET_THIS(sourceFileNode);
+// DFS_AST_GET_THIS(sourceFileNode);
 // console.log(typeA===typeB); through check can find that typeA will equal to typeB
 /**
  * this exp could prove that typeC equal to typeB
@@ -146,4 +173,4 @@ DFS_AST_GET_THIS(sourceFileNode);
   type: 'Identifier',
   dep: 0
 }
- */ 
+ */

@@ -1,8 +1,28 @@
 import { resolve } from 'path';
 import  ts = require('typescript');
+import fs = require("fs");
 // import { hasPropertyAccess } from '../src/utils'
 
-const filePath = resolve('.','../test/index.ts');
+fs.writeFileSync('./out.txt',"");
+
+
+const printTsNodeWithoutPa = (node) => {
+    if(typeof node !== "object") return ;
+    let cache = []
+    fs.appendFileSync('./out.txt',JSON.stringify(node,(key,value)=>{
+        if(key === 'parent') return ;
+        if (typeof value === 'object' && value !== null) {
+            if (cache.indexOf(value) !== -1) {
+                return;
+            }
+            cache.push(value);
+        }
+        return value;
+    } , 4));
+    cache = null;
+}
+
+const filePath = resolve('.','../test/class-def.ts');
 const ImportedFilePath = resolve('.','../test/export-assignment.ts');
 let index=0;
 const program = ts.createProgram({
@@ -30,29 +50,35 @@ ts.forEachChild(sourceFileNode,(node)=>{
     //     parent:undefined
     // }});
     // index++;
-    const {kind} = node;
-    if(kind === ts.SyntaxKind.ImportDeclaration){
-        // const claus = (node as ts.ImportDeclaration).importClause.name;
-        // const symbol = typeChecker.getSymbolAtLocation(claus);
-        // const type = typeChecker.getTypeAtLocation(claus).symbol;
-        // typeA=type;
-        // console.log({symbol,type})
+    // const {kind} = node;
+    // if(kind === ts.SyntaxKind.ImportDeclaration){
+    //     // const claus = (node as ts.ImportDeclaration).importClause.name;
+    //     // const symbol = typeChecker.getSymbolAtLocation(claus);
+    //     // const type = typeChecker.getTypeAtLocation(claus).symbol;
+    //     // typeA=type;
+    //     // console.log({symbol,type})
 
-        // exp B
-        const clause = (node as ts.ImportDeclaration).importClause;
-        const { namedBindings } = clause;
-        const nameArray = namedBindings?
-        (namedBindings as ts.NamespaceImport)?.name?[(namedBindings as ts.NamespaceImport)?.name]: (namedBindings as ts.NamedImports).elements.map(
-            (e) => (e.propertyName || e.name),
-            ):clause.name?[clause.name]:[]
-        nameArray.forEach(name=>{
-            const nameText = name.getText();
-            const symbol = typeChecker.getSymbolAtLocation(name);
-            const type = typeChecker.getTypeAtLocation(name).symbol;
-            symbolA = symbol;
-            // console.log({nameText,symbol,type})
-        })
+    //     // exp B
+    //     const clause = (node as ts.ImportDeclaration).importClause;
+    //     const { namedBindings } = clause;
+    //     const nameArray = namedBindings?
+    //     (namedBindings as ts.NamespaceImport)?.name?[(namedBindings as ts.NamespaceImport)?.name]: (namedBindings as ts.NamedImports).elements.map(
+    //         (e) => (e.propertyName || e.name),
+    //         ):clause.name?[clause.name]:[]
+    //     nameArray.forEach(name=>{
+    //         const nameText = name.getText();
+    //         const symbol = typeChecker.getSymbolAtLocation(name);
+    //         const type = typeChecker.getTypeAtLocation(name).symbol;
+    //         symbolA = symbol;
+    //         // console.log({nameText,symbol,type})
+    //     })
         
+    // }
+    if(ts.isClassDeclaration(node)){
+        // console.log(typeChecker.getTypeAtLocation(node).getSymbol())
+        ts.forEachChild(node,(chi)=>{
+            printTsNodeWithoutPa(typeChecker.getTypeAtLocation(chi).getSymbol());
+        })
     }
 })
 
@@ -77,7 +103,7 @@ function DFS_AST_GET_THIS(node: ts.Node,dep=0){
 }
 
 
-DFS_AST_GET_THIS(sourceFileNode);
+// DFS_AST_GET_THIS(sourceFileNode);
 // console.log(typeA===typeB); through check can find that typeA will equal to typeB
 
 
@@ -171,3 +197,4 @@ DFS_AST_GET_THIS(sourceFileNode);
   dep: 0
 }
  */
+

@@ -1,5 +1,5 @@
 
-export default class BizTest {
+export default class  {
     constructor(
         private a =1
     ){}
